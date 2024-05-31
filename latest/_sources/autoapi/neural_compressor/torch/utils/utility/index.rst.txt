@@ -18,6 +18,8 @@ Functions
    neural_compressor.torch.utils.utility.register_algo
    neural_compressor.torch.utils.utility.fetch_module
    neural_compressor.torch.utils.utility.set_module
+   neural_compressor.torch.utils.utility.get_quantizer
+   neural_compressor.torch.utils.utility.postprocess_model
 
 
 
@@ -61,5 +63,39 @@ Functions
    :type new_module: object
 
    :returns: module (object).
+
+
+.. py:function:: get_quantizer(model, quantizer_cls, quant_config=None, *args, **kwargs)
+
+   Get the quantizer.
+
+   Initialize a quantizer or get `quantizer` attribute from model.
+
+   :param model: pytorch model.
+   :type model: torch.nn.Module
+   :param quantizer_cls: quantizer class of a specific algorithm.
+   :type quantizer_cls: Quantizer
+   :param quant_config: Specifies how to apply the algorithm on the given model.
+                        Defaults to None.
+   :type quant_config: dict, optional
+
+   :returns: quantizer object.
+
+
+.. py:function:: postprocess_model(model, mode, quantizer)
+
+   Process `quantizer` attribute of model according to current phase.
+
+   In `prepare` phase, the `quantizer` is set as an attribute of the model
+   to avoid redundant initialization during `convert` phase.
+
+   In 'convert' or 'quantize' phase, the unused `quantizer` attribute is removed.
+
+   :param model: pytorch model.
+   :type model: torch.nn.Module
+   :param mode: The mode of current phase, including 'prepare', 'convert' and 'quantize'.
+   :type mode: Mode
+   :param quantizer: quantizer object.
+   :type quantizer: Quantizer
 
 

@@ -1,5 +1,5 @@
-:py:mod:`neural_compressor.model.tensorflow_model`
-==================================================
+neural_compressor.model.tensorflow_model
+========================================
 
 .. py:module:: neural_compressor.model.tensorflow_model
 
@@ -9,11 +9,8 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -25,9 +22,8 @@ Classes
    neural_compressor.model.tensorflow_model.TensorflowModel
 
 
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
@@ -38,6 +34,7 @@ Functions
    neural_compressor.model.tensorflow_model.graph_def_session
    neural_compressor.model.tensorflow_model.frozen_pb_session
    neural_compressor.model.tensorflow_model.load_saved_model
+   neural_compressor.model.tensorflow_model.try_loading_keras
    neural_compressor.model.tensorflow_model.keras_session
    neural_compressor.model.tensorflow_model.slim_session
    neural_compressor.model.tensorflow_model.checkpoint_session
@@ -45,6 +42,8 @@ Functions
    neural_compressor.model.tensorflow_model.saved_model_session
 
 
+Module Contents
+---------------
 
 .. py:function:: get_model_type(model)
 
@@ -152,6 +151,23 @@ Functions
    :rtype: graph_def
 
 
+.. py:function:: try_loading_keras(model, input_tensor_names, output_tensor_names)
+
+   Try different ways of loading keras models.
+
+   :param model: model path or tf.keras.Model object.
+   :type model: string or tf.keras.Model
+   :param input_tensor_names: input tensor names of the model.
+   :type input_tensor_names: list of string
+   :param output_tensor_names: output tensor names of the model.
+   :type output_tensor_names: list of string
+
+   :returns: tf.compat.v1.Session object.
+             input_names (list of string): validated input names.
+             output_names (list of string): validated output names.
+   :rtype: graph_def (tf.compat.v1.Session)
+
+
 .. py:function:: keras_session(model, input_tensor_names, output_tensor_names, **kwargs)
 
    Build session with keras model.
@@ -164,8 +180,6 @@ Functions
    :type output_tensor_names: list of string
 
    :returns: tf.compat.v1.Session object.
-             input_tensor_names (list of string): validated input_tensor_names.
-             output_tensor_names (list of string): validated output_tensor_names.
    :rtype: sess (tf.compat.v1.Session)
 
 
@@ -243,12 +257,10 @@ Functions
 
 
 
-
    Build Tensorflow Base Model.
 
 
 .. py:class:: TensorflowSavedModelModel(model, **kwargs)
-
 
 
 
@@ -259,12 +271,10 @@ Functions
 
 
 
-
    The class Tensorflow saved model whose GraphDef exceeding maximum protobuf size of 2GB.
 
 
 .. py:class:: TensorflowQATModel(model='', **kwargs)
-
 
 
 
@@ -275,12 +285,10 @@ Functions
 
 
 
-
    Build Tensorflow checkpoint model.
 
 
 .. py:class:: TensorflowModel
-
 
 
 

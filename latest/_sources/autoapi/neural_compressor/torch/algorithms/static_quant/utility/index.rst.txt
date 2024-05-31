@@ -14,8 +14,8 @@ Classes
 
 .. autoapisummary::
 
-   neural_compressor.torch.algorithms.static_quant.utility.TransformerBasedModelBlockPatternDetector
    neural_compressor.torch.algorithms.static_quant.utility.Statistics
+   neural_compressor.torch.algorithms.static_quant.utility.TransformerBasedModelBlockPatternDetector
 
 
 
@@ -24,15 +24,75 @@ Functions
 
 .. autoapisummary::
 
+   neural_compressor.torch.algorithms.static_quant.utility.check_cfg_and_qconfig
+   neural_compressor.torch.algorithms.static_quant.utility.generate_activation_observer
+   neural_compressor.torch.algorithms.static_quant.utility.get_quantizable_ops_recursively
+   neural_compressor.torch.algorithms.static_quant.utility.simple_inference
+   neural_compressor.torch.algorithms.static_quant.utility.dump_model_op_stats
    neural_compressor.torch.algorithms.static_quant.utility.get_depth
    neural_compressor.torch.algorithms.static_quant.utility.get_dict_at_depth
    neural_compressor.torch.algorithms.static_quant.utility.get_element_under_depth
-   neural_compressor.torch.algorithms.static_quant.utility.paser_cfgs
+   neural_compressor.torch.algorithms.static_quant.utility.parse_cfgs
    neural_compressor.torch.algorithms.static_quant.utility.get_quantizable_ops_from_cfgs
-   neural_compressor.torch.algorithms.static_quant.utility.simple_inference
-   neural_compressor.torch.algorithms.static_quant.utility.dump_model_op_stats
-   neural_compressor.torch.algorithms.static_quant.utility.get_quantizable_ops_recursively
 
+
+
+.. py:function:: check_cfg_and_qconfig(user_cfg, cfgs, op_infos_from_cfgs, output_tensor_ids_op_name)
+
+   Check configs and quantization configs.
+
+   :param user_cfg: quantization configuration for ops.
+   :type user_cfg: dict
+   :param cfgs: configs loaded from ipex config path.
+   :type cfgs: dict
+   :param op_infos_from_cfgs: dict containing configs that have been parsed for each op.
+   :type op_infos_from_cfgs: dict
+   :param output_tensor_ids_op_name: dict containing op names corresponding to 'op_infos_from_cfgs'.
+   :type output_tensor_ids_op_name: dict
+
+   :returns: updated configs.
+   :rtype: cfgs (dict)
+
+
+.. py:function:: generate_activation_observer(scheme, algorithm, smooth_quant=False, smooth_quant_enable=False)
+
+   This is a helper method to generate a dict containing activation observer info.
+
+   :param scheme: Quantization scheme to be used.
+   :type scheme: str
+   :param algorithm: What algorithm for computing the quantization parameters based on.
+   :type algorithm: str
+
+   :returns: A dict containing observer info.zs
+
+
+.. py:function:: get_quantizable_ops_recursively(model, example_inputs)
+
+   Get all quantizable ops from model.
+
+   :param model: input model
+   :type model: object
+   :param example_inputs: used to trace torch model.
+   :type example_inputs: dict|list|tuple|torch.Tensor
+
+   :returns: list of tuples of op_name and op_type.
+             cfgs (dict): dict of configuration
+   :rtype: quantizable_ops (list)
+
+
+.. py:function:: simple_inference(q_model, example_inputs, iterations=1)
+
+   The function is used for ipex warm-up inference.
+
+
+.. py:function:: dump_model_op_stats(user_cfg)
+
+   This is a function to dump quantizable ops of model to user.
+
+   :param user_cfg: quantization config
+   :type user_cfg: dict
+
+   :returns: None
 
 
 .. py:function:: get_depth(d) -> int
@@ -50,7 +110,7 @@ Functions
    Get all values in a nested dict.
 
 
-.. py:function:: paser_cfgs(cfgs)
+.. py:function:: parse_cfgs(cfgs)
 
    Parse configs.
 
@@ -78,44 +138,15 @@ Functions
    :returns: cfgs (dict).
 
 
-.. py:function:: simple_inference(q_model, example_inputs, iterations=1)
-
-   The function is used for ipex warm-up inference.
+.. py:class:: Statistics(data, header, field_names, output_handle=logger.info)
 
 
-.. py:function:: dump_model_op_stats(tune_cfg)
-
-   This is a function to dump quantizable ops of model to user.
-
-   :param tune_cfg: quantization config
-   :type tune_cfg: dict
-
-   :returns: None
-
-
-.. py:function:: get_quantizable_ops_recursively(model, example_inputs)
-
-   Get all quantizable ops from model.
-
-   :param model: input model
-   :type model: object
-   :param example_inputs: used to trace torch model.
-   :type example_inputs: dict|list|tuple|torch.Tensor
-
-   :returns: list of tuples of op_name and op_type.
-             cfgs (dict): dict of configuration
-   :rtype: quantizable_ops (list)
+   The statistics printer.
 
 
 .. py:class:: TransformerBasedModelBlockPatternDetector(model: torch.nn.Module, pattern_lst: List[List[Union[str, int]]] = BLOCK_PATTERNS)
 
 
    Detect the attention block and FFN block in transformer-based model.
-
-
-.. py:class:: Statistics(data, header, field_names, output_handle=logger.info)
-
-
-   The statistics printer.
 
 
