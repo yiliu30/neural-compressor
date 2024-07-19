@@ -35,6 +35,22 @@ def optimize_weights_proximal_legacy(
     opt_params={"lp_norm": 0.7, "beta": 1e1, "kappa": 1.01, "iters": 20},
     verbose=False,
 ):
+    """
+    Optimize weights using a proximal solver.
+
+    Args:
+        tensor (torch.Tensor): The input tensor to be optimized.
+        scale (torch.Tensor): The scale tensor for quantization.
+        zero (torch.Tensor): The zero tensor for quantization.
+        min_max (tuple): The minimum and maximum values for quantization.
+        axis (int, optional): The axis along which to optimize. Defaults to 0.
+        device (str, optional): The device to use for computation. Defaults to "cuda".
+        opt_params (dict, optional): Optimization parameters. Defaults to {"lp_norm": 0.7, "beta": 1e1, "kappa": 1.01, "iters": 20}.
+        verbose (bool, optional): Whether to print verbose output. Defaults to False.
+
+    Returns:
+        tuple: The optimized scale and zero tensors.
+    """
     lp_norm, beta, kappa, iters = (
         opt_params["lp_norm"],
         opt_params["beta"],

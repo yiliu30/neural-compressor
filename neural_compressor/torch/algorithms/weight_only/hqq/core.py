@@ -39,6 +39,26 @@ __all__ = [
 
 
 class HQQTensorHandle:
+    """
+    A class for handling quantized tensors using the HQQ algorithm.
+
+    Attributes:
+        SUPPORTED_BITS (list): List of supported bit-widths for quantization.
+        optimize_weights (function): Function for optimizing weights.
+
+    Methods:
+        quantize(float_tensor, tensor_quant_config=None):
+            Quantizes a given float tensor.
+        dequantize(q_weight):
+            Dequantizes a given quantized tensor.
+        _create_q_tensor(weight, meta):
+            Creates a QTensor object from the given weight and meta information.
+        _quantize(tensor, tensor_quant_config=None):
+            Internal method for quantizing a tensor.
+        _dequantize(W_q, meta):
+            Internal method for dequantizing a quantized tensor.
+    """
+
     # Refactored the code from https://github.com/mobiusml/hqq.
 
     # Store meta-data (we invert the scale for dequantization)
@@ -47,6 +67,16 @@ class HQQTensorHandle:
 
     @classmethod
     def quantize(cls, float_tensor, tensor_quant_config: QTensorConfig = None):
+        """
+        Quantizes a given float tensor.
+
+        Args:
+            float_tensor (torch.Tensor): The float tensor to be quantized.
+            tensor_quant_config (QTensorConfig, optional): Configuration for tensor quantization. Defaults to None.
+
+        Returns:
+            QTensor: The quantized tensor.
+        """
         q_weight, q_tensor_meta = cls._quantize(
             tensor=float_tensor,
             tensor_quant_config=tensor_quant_config,
@@ -56,6 +86,15 @@ class HQQTensorHandle:
 
     @classmethod
     def dequantize(cls, q_weight: "QTensor") -> torch.Tensor:
+        """
+        Dequantizes a given quantized tensor.
+
+        Args:
+            q_weight (QTensor): The quantized tensor to be dequantized.
+
+        Returns:
+            torch.Tensor: The dequantized float tensor.
+        """
         # Dequantized the Qtensor into float tensor
         meta = q_weight.meta_info.to_dict()
         meta["zero"] = q_weight.zero
@@ -64,6 +103,16 @@ class HQQTensorHandle:
 
     @classmethod
     def _create_q_tensor(cls, weight, meta) -> "QTensor":
+        """
+        Creates a QTensor object from the given weight and meta information.
+
+        Args:
+            weight (torch.Tensor): The quantized weight tensor.
+            meta (dict): Meta information for the quantized tensor.
+
+        Returns:
+            QTensor: The created QTensor object.
+        """
         scale = meta["scale"]
         zero = meta["zero"]
         meta_info = QTensorMetaInfo(
@@ -77,6 +126,16 @@ class HQQTensorHandle:
 
     @classmethod
     def _quantize(cls, tensor, tensor_quant_config: QTensorConfig = None):
+        """
+        Internal method for quantizing a tensor.
+
+        Args:
+            tensor (torch.Tensor): The tensor to be quantized.
+            tensor_quant_config (QTensorConfig, optional): Configuration for tensor quantization. Defaults to None.
+
+        Returns:
+            Tuple[torch.Tensor, dict]: The quantized tensor and its meta information.
+        """
         nbits = tensor_quant_config.nbits
         channel_wise = tensor_quant_config.channel_wise
         group_size = tensor_quant_config.group_size if tensor_quant_config.group_size != -1 else None
@@ -160,8 +219,18 @@ class HQQTensorHandle:
 
     @classmethod
     def _dequantize(cls, W_q, meta):
+        """
+        Internal method for dequantizing a quantized tensor.
+
+        Args:
+            W_q (torch.Tensor): The quantized tensor.
+            meta (dict): Meta information for the quantized tensor.
+
+        Returns:
+            torch.Tensor: The dequantized float tensor.
+        """
         # Main dequantization: bit_unpacking > (W_q - z)*s > reshape
-        if meta["packing"]:
+        if (meta["packing"]):
             W_r = Packer.get_unpack_fn(meta["nbits"])(W_q)
             if hqq_global_option.use_half:
                 W_r = W_r.half()
@@ -176,6 +245,29 @@ class HQQTensorHandle:
 
 
 class HQQLinear(torch.nn.Linear):
+    """
+    A class for quantizing linear layers using the HQQ algorithm.
+
+    Attributes:
+        q_weight (QTensor): The quantized weight tensor.
+        quantized (bool): Whether the weight has been quantized.
+
+    Methods:
+        quantize_weight(W, quant_config=default_hqq_module_config):
+            Quantizes the weight tensor.
+        dequantize_weight():
+            Dequantizes the weight tensor.
+        forward(input):
+            Performs the forward pass using the quantized weight.
+        from_float(float_module, quant_config=default_hqq_module_config):
+            Creates a quantized linear module from a float linear module.
+        state_dict(*args, **kwargs):
+            Returns the state dictionary of the module.
+        _load_from_state_dict(state_dict, prefix, local_metadata, strict, missing_keys, unexpected_keys, error_msgs):
+            Loads the state dictionary into the module.
+        _assign_state_dict(state_dict, strict=True, assign=False):
+            Assigns the state dictionary to the module.
+    """
 
     def __init__(
         self,
@@ -196,6 +288,16 @@ class HQQLinear(torch.nn.Linear):
         W: torch.Tensor,
         quant_config: HQQModuleConfig = default_hqq_module_config,
     ) -> Tuple[torch.Tensor, Dict[str, Any]]:
+        """
+        Quantizes the weight tensor.
+
+        Args:
+            W (torch.Tensor): The weight tensor to be quantized.
+            quant_config (HQQModuleConfig, optional): Configuration for module quantization. Defaults to default_hqq_module_config.
+
+        Returns:
+            Tuple[torch.Tensor, Dict[str, Any]]: The quantized weight tensor and its meta information.
+        """
         weight_quant_config, scale_quant_config, zero_quant_config = (
             quant_config.weight,
             quant_config.scale,
@@ -227,6 +329,12 @@ class HQQLinear(torch.nn.Linear):
         self.quantized = True
 
     def dequantize_weight(self):
+        """
+        Dequantizes the weight tensor.
+
+        Returns:
+            torch.Tensor: The dequantized weight tensor.
+        """
         assert self.quantized, "model was not quantized"
         # TODO: move below logic into `HQQTensorHandle`
         if self.q_weight.is_scale_quantized():
@@ -241,6 +349,15 @@ class HQQLinear(torch.nn.Linear):
         return W_qdq
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
+        """
+        Performs the forward pass using the quantized weight.
+
+        Args:
+            input (torch.Tensor): The input tensor.
+
+        Returns:
+            torch.Tensor: The output tensor.
+        """
         out = torch.matmul(input, self.dequantize_weight().t())
         if self.bias is not None:
             out += self.bias
@@ -252,6 +369,16 @@ class HQQLinear(torch.nn.Linear):
         float_module: torch.nn.Linear,
         quant_config: HQQModuleConfig = default_hqq_module_config,
     ):
+        """
+        Creates a quantized linear module from a float linear module.
+
+        Args:
+            float_module (torch.nn.Linear): The float linear module.
+            quant_config (HQQModuleConfig, optional): Configuration for module quantization. Defaults to default_hqq_module_config.
+
+        Returns:
+            HQQLinear: The created quantized linear module.
+        """
         # Create the new module with a toy size to ensure initialization is fast
         fake_in_features, fake_out_features = 8, 8
         new_mod = cls(
@@ -280,6 +407,12 @@ class HQQLinear(torch.nn.Linear):
         return new_mod
 
     def state_dict(self, *args, **kwargs):  # nn.Module override compatible
+        """
+        Returns the state dictionary of the module.
+
+        Returns:
+            dict: The state dictionary of the module.
+        """
         state_dict = self.q_weight.to_state_dict()
         if self.bias is not None:
             state_dict["bias"] = self.bias
@@ -298,6 +431,18 @@ class HQQLinear(torch.nn.Linear):
         unexpected_keys,
         error_msgs,
     ):
+        """
+        Loads the state dictionary into the module.
+
+        Args:
+            state_dict (dict): The state dictionary to be loaded.
+            prefix (str): The prefix for the keys in the state dictionary.
+            local_metadata (dict): Local metadata for the state dictionary.
+            strict (bool): Whether to strictly enforce that the keys in `state_dict` match the keys returned by this module's `state_dict` function.
+            missing_keys (list): List to store missing keys.
+            unexpected_keys (list): List to store unexpected keys.
+            error_msgs (list): List to store error messages.
+        """
         all_expected_keys = ["val", "scale_quantized", "zero_quantized", "meta_info"]
         if self.bias is not None:
             all_expected_keys.append("bias")
@@ -316,6 +461,14 @@ class HQQLinear(torch.nn.Linear):
         self._assign_state_dict(cur_state_dict, strict)
 
     def _assign_state_dict(self, state_dict: Mapping[str, Any], strict: bool = True, assign: bool = False):
+        """
+        Assigns the state dictionary to the module.
+
+        Args:
+            state_dict (dict): The state dictionary to be assigned.
+            strict (bool, optional): Whether to strictly enforce that the keys in `state_dict` match the keys returned by this module's `state_dict` function. Defaults to True.
+            assign (bool, optional): Whether to assign the state dictionary. Defaults to False.
+        """
         _scale_quantized = state_dict["scale_quantized"]
         _zero_quantized = state_dict["zero_quantized"]
         scale_state = state_dict["meta_info"]["scale"]

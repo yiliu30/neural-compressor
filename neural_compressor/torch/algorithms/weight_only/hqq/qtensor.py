@@ -25,6 +25,16 @@ __all__ = [
 
 @dataclass
 class QTensorMetaInfo:
+    """
+    Meta information for quantized tensors.
+
+    Attributes:
+        nbits (int): Number of bits for quantization.
+        group_size (int): Size of the quantization group.
+        shape (Tuple): Shape of the tensor.
+        axis (int): Axis for quantization.
+        packing (bool): Whether the tensor is packed.
+    """
     nbits: int
     group_size: int
     shape: Tuple
@@ -32,10 +42,43 @@ class QTensorMetaInfo:
     packing: bool
 
     def to_dict(self):
+        """
+        Converts the QTensorMetaInfo object to a dictionary.
+
+        Returns:
+            dict: A dictionary representation of the QTensorMetaInfo object.
+        """
         return asdict(self)
 
 
 class QTensor:
+    """
+    A class representing a quantized tensor.
+
+    Attributes:
+        val (torch.Tensor): The quantized tensor values.
+        scale (Union[torch.Tensor, "QTensor"], optional): The scale tensor or quantized scale tensor.
+        zero (Union[torch.Tensor, "QTensor"], optional): The zero tensor or quantized zero tensor.
+        meta_info (QTensorMetaInfo, optional): Meta information for the quantized tensor.
+
+    Methods:
+        is_scale_quantized() -> bool:
+            Checks if the scale is quantized.
+        is_zero_quantized() -> bool:
+            Checks if the zero is quantized.
+        _get_scale_repr() -> str:
+            Returns a string representation of the scale.
+        _get_zero_repr() -> str:
+            Returns a string representation of the zero.
+        __repr__() -> str:
+            Returns a string representation of the QTensor object.
+        to(*args, **kwargs):
+            Moves the tensor to the specified device and dtype.
+        half():
+            Converts the tensor to half precision.
+        to_state_dict() -> dict:
+            Converts the QTensor object to a state dictionary.
+    """
     val: torch.Tensor
     scale: Union[torch.Tensor, "QTensor"] = None
     zero: Union[torch.Tensor, "QTensor"] = None
@@ -57,12 +100,30 @@ class QTensor:
         self.meta_info = meta_info
 
     def is_scale_quantized(self) -> bool:
+        """
+        Checks if the scale is quantized.
+
+        Returns:
+            bool: True if the scale is quantized, False otherwise.
+        """
         return isinstance(self.scale, QTensor)
 
     def is_zero_quantized(self) -> bool:
+        """
+        Checks if the zero is quantized.
+
+        Returns:
+            bool: True if the zero is quantized, False otherwise.
+        """
         return isinstance(self.zero, QTensor)
 
     def _get_scale_repr(self) -> str:
+        """
+        Returns a string representation of the scale.
+
+        Returns:
+            str: A string representation of the scale.
+        """
         if not self.is_scale_quantized():
             if self.scale is not None:
                 return (
@@ -76,6 +137,12 @@ class QTensor:
             return self.scale.__repr__() + "\n"
 
     def _get_zero_repr(self) -> str:
+        """
+        Returns a string representation of the zero.
+
+        Returns:
+            str: A string representation of the zero.
+        """
         if not self.is_zero_quantized():
             if self.zero is not None:
                 return (
@@ -89,6 +156,12 @@ class QTensor:
             return self.zero.__repr__() + "\n"
 
     def __repr__(self) -> str:
+        """
+        Returns a string representation of the QTensor object.
+
+        Returns:
+            str: A string representation of the QTensor object.
+        """
         # TODO: refine it later
         return (
             f"QTensor(\n"
@@ -101,12 +174,28 @@ class QTensor:
         )
 
     def to(self, *args, **kwargs):
+        """
+        Moves the tensor to the specified device and dtype.
+
+        Args:
+            *args: Positional arguments for the `to` method.
+            **kwargs: Keyword arguments for the `to` method.
+
+        Returns:
+            QTensor: The QTensor object moved to the specified device and dtype.
+        """
         self.val = self.val.to(*args, **kwargs)
         self.scale = self.scale.to(*args, **kwargs)
         self.zero = self.zero.to(*args, **kwargs)
         return self
 
     def half(self):
+        """
+        Converts the tensor to half precision.
+
+        Returns:
+            QTensor: The QTensor object in half precision.
+        """
         # TODO: refine it later
         if self.val.dtype == torch.float32:
             self.val = self.val.half()
@@ -117,6 +206,12 @@ class QTensor:
         return self
 
     def to_state_dict(self):
+        """
+        Converts the QTensor object to a state dictionary.
+
+        Returns:
+            dict: A state dictionary representation of the QTensor object.
+        """
         state = {}
         state["val"] = self.val
         state["meta_info"] = self.meta_info.to_dict()

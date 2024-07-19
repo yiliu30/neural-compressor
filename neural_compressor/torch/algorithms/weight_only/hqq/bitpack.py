@@ -30,27 +30,79 @@ __all__ = ["Packer"]
 
 # Bit packing logic. format: pack/unpack_nBits_target-<uint8 or int32>
 class BitPack:
+    """
+    A class for bit packing logic.
+
+    This class provides static methods for packing and unpacking tensors
+    with different bit-widths.
+
+    Methods:
+        pack_8bit_u8(W_q): Packs an 8-bit tensor to uint8.
+        unpack_8bit_u8(W_q): Unpacks an 8-bit tensor from uint8.
+        pack_4bit_u8(W_q): Packs a 4-bit tensor to uint8.
+        unpack_4bit_u8(W_q): Unpacks a 4-bit tensor from uint8.
+        pack_2bit_u8(W_q): Packs a 2-bit tensor to uint8.
+        unpack_2bit_u8(W_q): Unpacks a 2-bit tensor from uint8.
+        pack_3bit_32(W_q_in): Packs a 3-bit tensor to int32.
+        unpack_3bit_32(W_q): Unpacks a 3-bit tensor from int32.
+    """
+
     # 8-bit
     ################################################
     @staticmethod
     def pack_8bit_u8(W_q):
+        """
+        Packs an 8-bit tensor to uint8.
+
+        Args:
+            W_q (torch.Tensor): The tensor to be packed.
+
+        Returns:
+            torch.Tensor: The packed tensor.
+        """
         return W_q.to(torch.uint8)
 
     @staticmethod
     def unpack_8bit_u8(W_q):
+        """
+        Unpacks an 8-bit tensor from uint8.
+
+        Args:
+            W_q (torch.Tensor): The tensor to be unpacked.
+
+        Returns:
+            torch.Tensor: The unpacked tensor.
+        """
         return W_q
 
     # 4-bit
     ################################################
     @staticmethod
     def pack_4bit_u8(W_q):  # uint8 > uint8/2
+        """
+        Packs a 4-bit tensor to uint8.
+
+        Args:
+            W_q (torch.Tensor): The tensor to be packed.
+
+        Returns:
+            torch.Tensor: The packed tensor.
+        """
         W_q = W_q.to(torch.uint8)
         _step = int(len(W_q) / 2)
         return (W_q[:_step] << 4) | W_q[_step:]
 
-    # A bit faster than the _cat version
     @staticmethod
     def unpack_4bit_u8(W_q):  # uint8/2 > uint8
+        """
+        Unpacks a 4-bit tensor from uint8.
+
+        Args:
+            W_q (torch.Tensor): The tensor to be unpacked.
+
+        Returns:
+            torch.Tensor: The unpacked tensor.
+        """
         _step = W_q.shape[0]
         tmp = torch.empty([2 * _step, W_q.shape[1]], dtype=torch.uint8, device=W_q.device)
         tmp[:_step] = (W_q & 0b11110000) >> 4
@@ -61,13 +113,30 @@ class BitPack:
     ################################################
     @staticmethod
     def pack_2bit_u8(W_q):  # uint8 > uint8/4
+        """
+        Packs a 2-bit tensor to uint8.
+
+        Args:
+            W_q (torch.Tensor): The tensor to be packed.
+
+        Returns:
+            torch.Tensor: The packed tensor.
+        """
         W_q = W_q.to(torch.uint8)
         _step = int(len(W_q) / 4)
         return W_q[:_step] << 6 | W_q[_step : 2 * _step] << 4 | W_q[2 * _step : 3 * _step] << 2 | W_q[3 * _step :]
 
-    # A bit faster than the _cat version
     @staticmethod
     def unpack_2bit_u8(W_q):
+        """
+        Unpacks a 2-bit tensor from uint8.
+
+        Args:
+            W_q (torch.Tensor): The tensor to be unpacked.
+
+        Returns:
+            torch.Tensor: The unpacked tensor.
+        """
         _step = W_q.shape[0]
         tmp = torch.empty([4 * _step, W_q.shape[1]], dtype=torch.uint8, device=W_q.device)
         tmp[:_step] = (W_q & 0b11000000) >> 6
@@ -80,6 +149,15 @@ class BitPack:
     ################################################
     @staticmethod
     def pack_3bit_32(W_q_in):
+        """
+        Packs a 3-bit tensor to int32.
+
+        Args:
+            W_q_in (torch.Tensor): The tensor to be packed.
+
+        Returns:
+            torch.Tensor: The packed tensor.
+        """
         W_q = torch.zeros(
             [int(10 * np.ceil(W_q_in.shape[0] / 10.0)), W_q_in.shape[1]], device=W_q_in.device, dtype=torch.int32
         )
@@ -99,9 +177,17 @@ class BitPack:
         )
         return W_q
 
-    # A bit faster than _cat version
     @staticmethod
     def unpack_3bit_32(W_q):
+        """
+        Unpacks a 3-bit tensor from int32.
+
+        Args:
+            W_q (torch.Tensor): The tensor to be unpacked.
+
+        Returns:
+            torch.Tensor: The unpacked tensor.
+        """
         _step = W_q.shape[0]
         tmp = torch.empty([10 * _step, W_q.shape[1]], dtype=torch.uint8, device=W_q.device)
         tmp[:_step] = (W_q & 0b00111000000000000000000000000000) >> 27
@@ -118,6 +204,22 @@ class BitPack:
 
 
 class Packer:
+    """
+    A class for managing bit packing functions.
+
+    This class provides methods to get the appropriate packing and unpacking
+    functions based on the number of bits.
+
+    Attributes:
+        bit_to_packing (dict): A mapping from bit-width to packing format.
+        pack_fn_mapping (dict): A mapping from packing format to packing function.
+        unpack_fn_mapping (dict): A mapping from packing format to unpacking function.
+
+    Methods:
+        get_pack_fn(nbits): Returns the packing function for the given bit-width.
+        get_unpack_fn(nbits): Returns the unpacking function for the given bit-width.
+    """
+
     # TODO: Refine the packer
     bit_to_packing = {8: "8bit_u8", 4: "4bit_u8", 3: "3bit_32", 2: "2bit_u8"}
 
@@ -137,8 +239,26 @@ class Packer:
 
     @staticmethod
     def get_pack_fn(nbits: int):
+        """
+        Returns the packing function for the given bit-width.
+
+        Args:
+            nbits (int): The bit-width.
+
+        Returns:
+            function: The packing function.
+        """
         return Packer.pack_fn_mapping[Packer.bit_to_packing[nbits]]
 
     @staticmethod
     def get_unpack_fn(nbits: int):
+        """
+        Returns the unpacking function for the given bit-width.
+
+        Args:
+            nbits (int): The bit-width.
+
+        Returns:
+            function: The unpacking function.
+        """
         return Packer.unpack_fn_mapping[Packer.bit_to_packing[nbits]]

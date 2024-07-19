@@ -29,6 +29,16 @@ __all__ = [
 
 
 def is_divisible(val1, val2):
+    """
+    Check if val1 is divisible by val2.
+
+    Args:
+        val1 (int): The dividend.
+        val2 (int): The divisor.
+
+    Returns:
+        bool: True if val1 is divisible by val2, False otherwise.
+    """
     return int(val2 * np.ceil(val1 / val2)) == val1
 
 
@@ -54,10 +64,14 @@ def see_cuda_memory_usage(message, force=False):  # pragma: no cover
 
 
 def dump_elapsed_time(customized_msg=""):
-    """Get the elapsed time for decorated functions.
+    """
+    Decorator to measure and log the elapsed time for a function.
 
     Args:
-        customized_msg (string, optional): The parameter passed to decorator. Defaults to None.
+        customized_msg (str, optional): Custom message to include in the log. Defaults to "".
+
+    Returns:
+        function: The decorated function with elapsed time logging.
     """
 
     def f(func):

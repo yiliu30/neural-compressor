@@ -33,6 +33,12 @@ __all__ = [
 
 
 class HQQGlobalOptions:
+    """
+    Global options for HQQ.
+
+    Attributes:
+        use_half (bool): Whether to use half precision.
+    """
     use_half = os.getenv("HQQ_NOT_USE_HALF", "0") == "0"
 
 
@@ -41,6 +47,17 @@ hqq_global_option = HQQGlobalOptions()
 
 @dataclass
 class QTensorConfig:
+    """
+    Configuration for quantized tensors.
+
+    Attributes:
+        nbits (int): Number of bits for quantization.
+        channel_wise (bool): Whether to use channel-wise quantization.
+        group_size (int): Size of the quantization group.
+        optimize (bool): Whether to optimize the quantization.
+        round_zero (Optional[bool]): Whether to round zero.
+        pack (bool): Whether to pack the quantized tensor.
+    """
     nbits: int
     channel_wise: bool = True
     group_size: int = 128
@@ -67,6 +84,14 @@ class HQQModuleConfig(
         ["weight", "scale", "zero"],
     )
 ):
+    """
+    Configuration for HQQ modules.
+
+    Attributes:
+        weight (QTensorConfig): Configuration for weight quantization.
+        scale (QTensorConfig): Configuration for scale quantization.
+        zero (QTensorConfig): Configuration for zero quantization.
+    """
     def __new__(
         cls,
         weight=default_weight_quant_config,

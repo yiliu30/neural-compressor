@@ -14,3 +14,50 @@
 
 from .quantizer import HQQuantizer
 from .config import HQQModuleConfig, QTensorConfig
+
+class HQQuantizer:
+    """
+    A class for quantizing models using the HQQ algorithm.
+
+    Attributes:
+        quant_config (ConfigMappingType): Configuration for quantization.
+
+    Methods:
+        prepare(model: torch.nn.Module, *args, **kwargs) -> Optional[torch.nn.Module]:
+            Prepares a given model for quantization.
+        convert(model: torch.nn.Module, *args, **kwargs) -> Optional[torch.nn.Module]:
+            Converts a prepared model to a quantized model.
+        save(model, path):
+            Saves the quantized model to the specified path.
+    """
+
+class HQQModuleConfig:
+    """
+    Configuration for HQQ modules.
+
+    Attributes:
+        weight (QTensorConfig): Configuration for weight quantization.
+        scale (QTensorConfig): Configuration for scale quantization.
+        zero (QTensorConfig): Configuration for zero quantization.
+
+    Methods:
+        __repr__() -> str:
+            Returns a string representation of the HQQModuleConfig object.
+    """
+
+class QTensorConfig:
+    """
+    Configuration for quantized tensors.
+
+    Attributes:
+        nbits (int): Number of bits for quantization.
+        channel_wise (bool): Whether to use channel-wise quantization.
+        group_size (int): Size of the quantization group.
+        optimize (bool): Whether to optimize the quantization.
+        round_zero (Optional[bool]): Whether to round zero.
+        pack (bool): Whether to pack the quantized tensor.
+
+    Methods:
+        __repr__() -> str:
+            Returns a string representation of the QTensorConfig object.
+    """
