@@ -23,7 +23,7 @@ With the importance of a dataloader, different frameworks can have their own Dat
 
 - Neural Compressor treats batch size as a tuning parameter which means it can dynamically change the batch size to reach the accuracy goal.
 
-The unified  `DataLoader` API takes a [dataset](./dataset.html) as the input parameter and loads data from the dataset when needed. In special cases, users can also define their own dataloader classes, which must have `batch_size` attribute and `__iter__` function.
+The unified  `DataLoader` API takes a dataset as the input parameter and loads data from the dataset when needed. In special cases, users can also define their own dataloader classes, which must have `batch_size` attribute and `__iter__` function.
 
 Of cause, users can also use frameworks own dataloader in Neural Compressor.
 
@@ -31,11 +31,10 @@ Of cause, users can also use frameworks own dataloader in Neural Compressor.
 
 | Framework     | Status     |
 |---------------|:----------:|
-| TensorFlow    |  &#10004;  |
-| Keras         |  &#10004;  |
-| MXNet         |  &#10004;  |
+| TensorFlow (Deprecated)    |  &#10004;  |
+| Keras (Deprecated)         |  &#10004;  |
 | PyTorch       |  &#10004;  |
-| ONNX Runtime   |  &#10004;  |
+| ONNX Runtime (Deprecated)   |  &#10004;  |
 
 ## Get Started with DataLoader
 
@@ -45,7 +44,7 @@ Acceptable parameters for `DataLoader` API including:
 
 | Parameter     | Description     |
 |---------------|:----------:|
-|framework (str)| different frameworks, such as `tensorflow`, `tensorflow_itex`, `keras`, `mxnet`, `pytorch` and `onnxruntime`.|
+|framework (str)| different frameworks, such as `tensorflow`, `tensorflow_itex`, `keras`, `pytorch` and `onnxruntime`.|
 |dataset (object)| A dataset object from which to get data. Dataset must implement `__iter__` or `__getitem__` method.|
 |batch_size (int, optional)| How many samples per batch to load. Defaults to 1.|
 |collate_fn (Callable, optional)| Callable function that processes the batch you want to return from your dataloader. Defaults to None.|
@@ -94,6 +93,6 @@ q_model = quantization.fit(model, config, calib_dataloader=dataloader, eval_func
 
 ## Examples
 
-- Refer to this [example](https://github.com/intel/neural-compressor/blob/master/examples/onnxrt/body_analysis/onnx_model_zoo/ultraface/quantization/ptq_static) for how to define a customised dataloader.
+- Refer to this [example](https://github.com/intel/neural-compressor/blob/master/examples/deprecated/onnxrt/body_analysis/onnx_model_zoo/ultraface/quantization/ptq_static) for how to define a customised dataloader.
 
-- Refer to this [example](https://github.com/intel/neural-compressor/blob/master/examples/onnxrt/nlp/bert/quantization/ptq_static) for how to use internal dataloader.
+- Refer to this [example](https://github.com/intel/neural-compressor/blob/master/examples/deprecated/onnxrt/nlp/bert/quantization/ptq_static) for how to use internal dataloader.
