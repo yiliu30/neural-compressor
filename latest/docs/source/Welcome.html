@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Intel® Neural Compressor &mdash; Intel® Neural Compressor 3.7 documentation</title>
+  <title>Intel® Neural Compressor &mdash; Intel® Neural Compressor 3.7.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -92,7 +92,7 @@
 <h1>Intel® Neural Compressor<a class="headerlink" href="#intel-neural-compressor" title="Link to this heading"></a></h1>
 <p><h3> An open-source Python library supporting popular model compression techniques on all mainstream deep learning frameworks (TensorFlow, PyTorch, and ONNX Runtime)</h3></p>
 <p><a class="reference external" href="https://github.com/intel/neural-compressor"><img alt="python" src="https://img.shields.io/badge/python-3.10%2B-blue" /></a>
-<a class="reference external" href="https://github.com/intel/neural-compressor/releases"><img alt="version" src="https://img.shields.io/badge/release-3.6-green" /></a>
+<a class="reference external" href="https://github.com/intel/neural-compressor/releases"><img alt="version" src="https://img.shields.io/badge/release-3.7-green" /></a>
 <a class="reference external" href="https://github.com/intel/neural-compressor/blob/master/LICENSE"><img alt="license" src="https://img.shields.io/badge/license-Apache%202-blue" /></a>
 <a class="reference external" href="https://github.com/intel/neural-compressor"><img alt="coverage" src="https://img.shields.io/badge/coverage-85%25-green" /></a>
 <a class="reference external" href="https://pepy.tech/project/neural-compressor"><img alt="Downloads" src="https://static.pepy.tech/personalized-badge/neural-compressor?period=total&amp;units=international_system&amp;left_color=grey&amp;right_color=green&amp;left_text=downloads" /></a></p>
@@ -110,11 +110,11 @@ support AMD CPU, ARM CPU, and NVidia GPU through ONNX Runtime with limited testi
 <section id="what-s-new">
 <h2>What’s New<a class="headerlink" href="#what-s-new" title="Link to this heading"></a></h2>
 <ul class="simple">
+<li><p>[2025/12] <a class="reference external" href="./3x/PT_NVFP4Quant.html">NVFP4 quantization</a> experimental support</p></li>
 <li><p>[2025/10] <a class="reference external" href="./3x/PT_MXQuant.html">MXFP8 / MXFP4 quantization</a> experimental support</p></li>
 <li><p>[2025/09] FP8 dynamic quantization, including Linear, FusedMoE on Intel Gaudi AI Accelerators</p></li>
 <li><p>[2025/05] FP8 static quantization of DeepSeek V3/R1 model on Intel Gaudi AI Accelerators</p></li>
 <li><p>[2025/03] VLM quantization in transformers-like API on Intel CPU/GPU</p></li>
-<li><p>[2024/10] <a class="reference external" href="./3x/transformers_like_api.html">Transformers-like API</a> for INT4 inference on Intel CPU and GPU.</p></li>
 </ul>
 </section>
 <section id="installation">
@@ -213,16 +213,21 @@ support AMD CPU, ARM CPU, and NVidia GPU through ONNX Runtime with limited testi
   </thead>
   <tbody>
     <tr>
-        <td colspan="2" align="center"><a href="./3x/PyTorch.html">Overview</a></td>
-        <td colspan="2" align="center"><a href="./3x/PT_DynamicQuant.html">Dynamic Quantization</a></td>
-        <td colspan="2" align="center"><a href="./3x/PT_StaticQuant.html">Static Quantization</a></td>
+        <td colspan="8" align="center"><a href="./3x/PyTorch.html">Overview</a></td>
+    </tr>
+    <tr>
+        <td colspan="3" align="center"><a href="./3x/PT_DynamicQuant.html">Dynamic Quantization</a></td>
+        <td colspan="3" align="center"><a href="./3x/PT_StaticQuant.html">Static Quantization</a></td>
         <td colspan="2" align="center"><a href="./3x/PT_SmoothQuant.html">Smooth Quantization</a></td>
     </tr>
     <tr>
-        <td colspan="2" align="center"><a href="./3x/PT_WeightOnlyQuant.html">Weight-Only Quantization</a></td>
-        <td colspan="2" align="center"><a href="./3x/PT_FP8Quant.html">FP8 Quantization</a></td>
-        <td colspan="2" align="center"><a href="./3x/PT_MXQuant.html">MX Quantization</a></td>
+        <td colspan="3" align="center"><a href="./3x/PT_WeightOnlyQuant.html">Weight-Only Quantization</a></td>
+        <td colspan="3" align="center"><a href="./3x/PT_FP8Quant.html">FP8 Quantization</a></td>
         <td colspan="2" align="center"><a href="./3x/PT_MixedPrecision.html">Mixed Precision</a></td>
+    </tr>
+    <tr>
+        <td colspan="4" align="center"><a href="./3x/PT_MXQuant.html">MX Quantization</a></td>
+        <td colspan="4" align="center"><a href="./3x/PT_NVFP4Quant.html">NVFP4 Quantization</a></td>
     </tr>
   </tbody>
   <thead>
@@ -310,7 +315,7 @@ View <a class="reference external" href="https://github.com/intel/neural-compres
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   <jinja2.runtime.BlockReference object at 0x7f41a844ce60> 
+   <jinja2.runtime.BlockReference object at 0x7f40b4d5ae40> 
   <p></p><div><a href='https://www.intel.com/content/www/us/en/privacy/intel-cookie-notice.html' data-cookie-notice='true'>Cookies</a> <a href='https://www.intel.com/content/www/us/en/privacy/intel-privacy-notice.html'>| Privacy</a></div>
 
 

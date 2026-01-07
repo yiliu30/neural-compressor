@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quantization Aware Training (QAT) &mdash; Intel® Neural Compressor 3.7 documentation</title>
+  <title>Quantization Aware Training (QAT) &mdash; Intel® Neural Compressor 3.7.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../../../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../../../../../../_static/graphviz.css?v=4ae1632d" />
@@ -140,41 +140,23 @@
 </section>
 <section id="step-2">
 <h5>Step 2:<a class="headerlink" href="#step-2" title="Link to this heading"></a></h5>
-<p>Quantize the trained model using <code class="docutils literal notranslate"><span class="pre">prepare_qat()</span></code> by setting the following flags <code class="docutils literal notranslate"><span class="pre">--quant_scheme</span> <span class="pre">MXFP8</span> <span class="pre">--do_train</span> <span class="pre">False</span></code>. This inserts fake quantization modules into the model without starting training yet. Then save the model directly to a get post training quantization model.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">accelerate</span> <span class="n">launch</span> <span class="o">--</span><span class="n">config</span><span class="o">-</span><span class="n">file</span> <span class="n">accelerate_config</span><span class="o">/</span><span class="n">fsdp1</span><span class="o">.</span><span class="n">yaml</span> \
-  <span class="o">--</span><span class="n">fsdp_transformer_layer_cls_to_wrap</span> <span class="n">LlamaDecoderLayer</span> \
-  <span class="n">main</span><span class="o">.</span><span class="n">py</span> \
-  <span class="o">--</span><span class="n">model_name_or_path</span> <span class="o">./</span><span class="n">llama3</span><span class="mf">.1</span><span class="o">-</span><span class="n">finetuned</span> \
-  <span class="o">--</span><span class="n">model_max_length</span> <span class="mi">4096</span> \
-  <span class="o">--</span><span class="n">dataloader_drop_last</span> <span class="kc">True</span> \
-  <span class="o">--</span><span class="n">do_train</span> <span class="kc">False</span> \
-  <span class="o">--</span><span class="n">do_eval</span> <span class="kc">False</span> \
-  <span class="o">--</span><span class="n">quant_scheme</span> <span class="n">MXFP8</span> \
-  <span class="o">--</span><span class="n">output_dir</span> <span class="o">./</span><span class="n">llama3</span><span class="mf">.1</span><span class="o">-</span><span class="n">finetuned</span><span class="o">-</span><span class="n">ptq</span> \
-  <span class="o">--</span><span class="n">dataset</span> <span class="n">Daring</span><span class="o">-</span><span class="n">Anteater</span> \
-  <span class="o">--</span><span class="n">num_train_epochs</span> <span class="mf">2.0</span> \
-  <span class="o">--</span><span class="n">per_device_train_batch_size</span> <span class="mi">4</span> \
-  <span class="o">--</span><span class="n">per_device_eval_batch_size</span> <span class="mi">4</span> \
-  <span class="o">--</span><span class="n">gradient_accumulation_steps</span> <span class="mi">1</span> \
-  <span class="o">--</span><span class="n">eval_accumulation_steps</span> <span class="mi">1</span> \
-  <span class="o">--</span><span class="n">save_strategy</span> <span class="n">steps</span> \
-  <span class="o">--</span><span class="n">save_steps</span> <span class="mi">3000</span> \
-  <span class="o">--</span><span class="n">eval_strategy</span> <span class="n">steps</span> \
-  <span class="o">--</span><span class="n">eval_steps</span> <span class="mi">3000</span> \
-  <span class="o">--</span><span class="n">load_best_model_at_end</span> <span class="kc">True</span> \
-  <span class="o">--</span><span class="n">save_total_limit</span> <span class="mi">2</span> \
-  <span class="o">--</span><span class="n">learning_rate</span> <span class="mf">1e-5</span> \
-  <span class="o">--</span><span class="n">weight_decay</span> <span class="mf">0.0</span> \
-  <span class="o">--</span><span class="n">warmup_ratio</span> <span class="mf">0.1</span> \
-  <span class="o">--</span><span class="n">lr_scheduler_type</span> <span class="n">linear</span> \
-  <span class="o">--</span><span class="n">logging_steps</span> <span class="mi">1</span> \
-  <span class="o">--</span><span class="n">report_to</span> <span class="n">tensorboard</span>
+<p>Save the model directly to get a post training quantization model by following this example <a class="reference external" href="https://github.com/intel/neural-compressor/tree/master/examples/pytorch/nlp/huggingface_models/language-modeling/quantization/auto_round/llama3">auto_round
+</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="mi">0</span> <span class="n">python</span> <span class="o">../</span><span class="n">auto_round</span><span class="o">/</span><span class="n">llama3</span><span class="o">/</span><span class="n">quantize</span><span class="o">.</span><span class="n">py</span>  \
+    <span class="o">--</span><span class="n">model_name_or_path</span> <span class="o">./</span><span class="n">llama3</span><span class="mf">.1</span><span class="o">-</span><span class="n">finetuned</span>  \
+    <span class="o">--</span><span class="n">quantize</span> \
+    <span class="o">--</span><span class="n">dtype</span> <span class="n">MXFP4</span> \
+    <span class="o">--</span><span class="n">enable_torch_compile</span> \
+    <span class="o">--</span><span class="n">low_gpu_mem_usage</span> \
+    <span class="o">--</span><span class="n">export_format</span> <span class="n">llm_compressor</span> \
+    <span class="o">--</span><span class="n">export_path</span> <span class="n">llama3</span><span class="mf">.1</span><span class="o">-</span><span class="n">finetuned</span><span class="o">-</span><span class="n">rtn</span><span class="o">-</span><span class="n">MXFP4</span> \
+    <span class="o">--</span><span class="n">iters</span> <span class="mi">0</span>
 </pre></div>
 </div>
 </section>
 <section id="step-3">
 <h5>Step 3:<a class="headerlink" href="#step-3" title="Link to this heading"></a></h5>
-<p>Train/fine-tune the quantized model with a small learning rate, e.g. 1e-5 for Adam optimizer by setting <code class="docutils literal notranslate"><span class="pre">--quant_scheme</span> <span class="pre">MXFP8</span> <span class="pre">--do_train</span> <span class="pre">True</span></code></p>
+<p>Train/fine-tune the quantized model with a small learning rate, e.g. 1e-5 for Adam optimizer by setting <code class="docutils literal notranslate"><span class="pre">--quant_scheme</span> <span class="pre">MXFP4</span> <span class="pre">--do_train</span> <span class="pre">True</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">accelerate</span> <span class="n">launch</span> <span class="o">--</span><span class="n">config</span><span class="o">-</span><span class="n">file</span> <span class="n">accelerate_config</span><span class="o">/</span><span class="n">fsdp1</span><span class="o">.</span><span class="n">yaml</span> \
   <span class="o">--</span><span class="n">fsdp_transformer_layer_cls_to_wrap</span> <span class="n">LlamaDecoderLayer</span> \
   <span class="n">main</span><span class="o">.</span><span class="n">py</span> \
@@ -183,7 +165,7 @@
   <span class="o">--</span><span class="n">dataloader_drop_last</span> <span class="kc">True</span> \
   <span class="o">--</span><span class="n">do_train</span> <span class="kc">True</span> \
   <span class="o">--</span><span class="n">do_eval</span> <span class="kc">True</span> \
-  <span class="o">--</span><span class="n">quant_scheme</span> <span class="n">MXFP8</span> \
+  <span class="o">--</span><span class="n">quant_scheme</span> <span class="n">MXFP4</span> \
   <span class="o">--</span><span class="n">output_dir</span> <span class="o">./</span><span class="n">llama3</span><span class="mf">.1</span><span class="o">-</span><span class="n">finetuned</span><span class="o">-</span><span class="n">qat</span> \
   <span class="o">--</span><span class="n">dataset</span> <span class="n">Daring</span><span class="o">-</span><span class="n">Anteater</span> \
   <span class="o">--</span><span class="n">max_steps</span> <span class="mi">1000</span> \
@@ -236,7 +218,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   <jinja2.runtime.BlockReference object at 0x7f41a8018d70> 
+   <jinja2.runtime.BlockReference object at 0x7f40b47f80b0> 
   <p></p><div><a href='https://www.intel.com/content/www/us/en/privacy/intel-cookie-notice.html' data-cookie-notice='true'>Cookies</a> <a href='https://www.intel.com/content/www/us/en/privacy/intel-privacy-notice.html'>| Privacy</a></div>
 
 
